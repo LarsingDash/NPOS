@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import nl.beunbv.npos.MainActivity
 import nl.beunbv.npos.data.Store
+import nl.beunbv.npos.notification.Messages
+import nl.beunbv.npos.notification.NotificationHandler
 import nl.beunbv.npos.ui.components.*
 
 @Composable
@@ -63,6 +65,16 @@ fun MapScreen(
                     user = newLocation,
                     store = store.value!!.location,
                     context = context)) {
+
+                store.value?.let {
+                    NotificationHandler.postMessage(
+                        storeName = it.name,
+                        storeID = it.id,
+                        message = Messages.ARRIVE,
+                        context = context
+                    )
+                }
+                
                 store.value = null
             }
         }

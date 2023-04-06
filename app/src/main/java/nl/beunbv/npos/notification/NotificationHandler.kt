@@ -10,6 +10,12 @@ import androidx.core.app.NotificationCompat
 import nl.beunbv.npos.MainActivity
 import nl.beunbv.npos.R
 
+enum class Messages(val wentOpen: Boolean) {
+    OPEN(true),
+    CLOSE(false),
+    ARRIVE(true)
+}
+
 class NotificationHandler {
     companion object {
         private lateinit var manager: NotificationManager
@@ -32,9 +38,15 @@ class NotificationHandler {
         fun postMessage(
             storeName: String,
             storeID: Int,
-            wentOpen: Boolean,
+            message: Messages,
             context: Context
         ) {
+            val text: String =
+                if (message == Messages.ARRIVE) "Je hebt $storeName berijkt!"
+                else "$storeName zal over 10 minuten ${
+                    if (message.wentOpen)
+                        "openen" else "sluiten"
+                }!"
             val builder = NotificationCompat.Builder(context, channelID)
                 .setSmallIcon(
                     when {
@@ -43,7 +55,7 @@ class NotificationHandler {
                         else -> R.drawable.albert_heijn
                     }
                 )
-                .setContentTitle("$storeName zal over 10 minuten ${if (wentOpen) "openen" else "sluiten"}!")
+                .setContentTitle(text)
                 .setContentIntent(
                     PendingIntent.getActivity(
                         context,

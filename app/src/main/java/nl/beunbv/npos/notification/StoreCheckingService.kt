@@ -27,7 +27,7 @@ class StoreCheckingService : Service() {
                     first = localDateTime.hour,
                     second = localDateTime.minute)
 
-                for (store in stores) {
+                stores.forEach { store ->
                     checkTime(
                         store = store,
                         currentTime = currentTime,
@@ -59,24 +59,22 @@ class StoreCheckingService : Service() {
             currentTime: Pair<Int, Int>,
             context: Context?
         ): Boolean {
-            if (compareTimes(
-                    store = store.openTime,
+            if (store.openTime.compareTimes(
                     now = currentTime)) {
                 if (context != null)
                     NotificationHandler.postMessage(
                         storeName = store.name,
                         storeID = store.id,
-                        wentOpen = true,
+                        message = Messages.OPEN,
                         context = context)
                 return true
-            } else if (compareTimes(
-                    store = store.closeTime,
+            } else if (store.closeTime.compareTimes(
                     now = currentTime)) {
                 if (context != null)
                     NotificationHandler.postMessage(
                         storeName = store.name,
                         storeID = store.id,
-                        wentOpen = false,
+                        message = Messages.CLOSE,
                         context = context)
                 return true
             }
@@ -84,12 +82,12 @@ class StoreCheckingService : Service() {
             return false
         }
 
-        fun compareTimes(store: Pair<Int, Int>, now: Pair<Int, Int>): Boolean {
-            if (store.first == now.first) {
-                if (store.second - now.second == 10) {
+        private fun Pair<Int, Int>.compareTimes(now: Pair<Int, Int>): Boolean {
+            if (this.first == now.first) {
+                if (this.second - now.second == 10) {
                     return true
                 }
-            } else if (store.first - now.first == 1 && now.second == 50) {
+            } else if (this.first - now.first == 1 && now.second == 50) {
                 return true
             }
 

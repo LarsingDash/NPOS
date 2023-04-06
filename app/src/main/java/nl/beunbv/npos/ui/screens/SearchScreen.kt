@@ -49,6 +49,7 @@ fun SearchScreen(
 
     val arrayList = arrayListOf<Store>()
     arrayList.addAll(elements = fullList.value)
+
     val searchList = reformatList(
         list = arrayList,
         searchValue = searchBarValue.value.text,
@@ -115,7 +116,7 @@ fun reformatList(
 ): List<Store> {
     val map = TreeMap<Double, Store>()
     val loaders = arrayListOf<Thread>()
-    for (store in list) {
+    list.forEach { store ->
         if (searchValue.isNotBlank()) {
             var containsFilter = false
             for (product in store.products) {
@@ -127,7 +128,7 @@ fun reformatList(
 
                 continue
             }
-            if (!containsFilter) continue
+            if (!containsFilter) return@forEach
         }
 
         val loader = Thread {
@@ -144,9 +145,7 @@ fun reformatList(
     loaders.forEach { thread -> thread.join() }
 
     list.clear()
-    for (entry in map) {
-        list.add(element = entry.value)
-    }
+    map.forEach { entry -> list.add(element = entry.value) }
 
     return list
 }
