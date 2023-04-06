@@ -108,8 +108,7 @@ class MainActivity : ComponentActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
 
-            if (hasFineLocation && hasCourseLocation
-            ) {
+            if (hasFineLocation && hasCourseLocation) {
                 hasPermissions = true
 
                 //Assign request

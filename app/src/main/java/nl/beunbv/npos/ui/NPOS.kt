@@ -39,7 +39,7 @@ fun NPOS() {
     val navController: NavHostController = rememberNavController()
 
     currentPage = remember {
-        mutableStateOf(Pages.Search.title)
+        mutableStateOf(value = Pages.Search.title)
     }
 
     val currentActivity = LocalContext.current as Activity
@@ -50,13 +50,13 @@ fun NPOS() {
                 searchButtonUnit = {
                     if (currentPage.value != Pages.Search.title) {
                         MainActivity.unfoldedStore = -1
-                        navController.navigate(Pages.Search.title)
+                        navController.navigate(route = Pages.Search.title)
                         currentPage.value = Pages.Search.title
                     }
                 },
                 mapButtonUnit = {
                     if (currentPage.value != Pages.Map.title) {
-                        navController.navigate(Pages.Map.title + "/-1")
+                        navController.navigate(route = Pages.Map.title + "/-1")
                         currentPage.value = Pages.Map.title
                     }
                 }
@@ -66,7 +66,7 @@ fun NPOS() {
         NavHost(
             navController = navController,
             startDestination = Pages.Search.title,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues = paddingValues)
         ) {
             composable(
                 route = Pages.Search.title,
@@ -86,7 +86,7 @@ fun NPOS() {
             //Map
             composable(
                 route = Pages.Map.title + "/{storeID}",
-                arguments = listOf(navArgument("storeID") { type = NavType.IntType })
+                arguments = listOf(navArgument(name = "storeID") { type = NavType.IntType })
             ) {
                 val storeID = it.arguments?.getInt("storeID")
 
@@ -126,7 +126,11 @@ private fun BottomBar(
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = Pages.Search.title,
-                        modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 3.dp)
+                        modifier = Modifier.padding(
+                            start = 0.dp,
+                            top = 0.dp,
+                            end = 0.dp,
+                            bottom = 3.dp)
                     )
                 },
                 selected = currentPage.value == Pages.Search.title,
@@ -147,7 +151,11 @@ private fun BottomBar(
                     Icon(
                         imageVector = Icons.Default.Place,
                         contentDescription = Pages.Map.title,
-                        modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 3.dp)
+                        modifier = Modifier.padding(
+                            start = 0.dp,
+                            top = 0.dp,
+                            end = 0.dp,
+                            bottom = 3.dp)
                     )
                 },
                 selected = currentPage.value == Pages.Map.title,
