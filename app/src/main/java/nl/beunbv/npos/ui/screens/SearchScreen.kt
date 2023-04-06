@@ -40,7 +40,7 @@ fun SearchScreen(
     (roadManager as OSRMRoadManager).setMean(OSRMRoadManager.MEAN_BY_FOOT)
 
     fullList = remember {
-        mutableStateOf(MainActivity.jsonHandler.stores)
+        mutableStateOf(value = MainActivity.jsonHandler.stores)
     }
     searchBarValue = remember { mutableStateOf(TextFieldValue("")) }
 
@@ -48,12 +48,12 @@ fun SearchScreen(
     var preOpenedStoreID by remember { mutableStateOf(storeID) }
 
     val arrayList = arrayListOf<Store>()
-    arrayList.addAll(fullList.value)
+    arrayList.addAll(elements = fullList.value)
     val searchList = reformatList(
-        arrayList,
-        searchBarValue.value.text,
-        roadManager,
-        MainActivity.userLocation
+        list = arrayList,
+        searchValue = searchBarValue.value.text,
+        roadManager = roadManager,
+        userLocation = MainActivity.userLocation
     )
 
     Column(
@@ -79,10 +79,13 @@ fun SearchScreen(
 
         LazyColumn(
             modifier = Modifier
-                .background(Color(240, 240, 240))
+                .background(color = Color(
+                    red = 240,
+                    green = 240,
+                    blue = 240))
                 .fillMaxHeight()
         ) {
-            items(searchList.size) { index ->
+            items(count = searchList.size) { index ->
                 val store = searchList[index]
 
                 var foldout = false
@@ -96,7 +99,7 @@ fun SearchScreen(
                         preOpenedStoreID = null
                     },
                     isFoldedOut = foldout,
-                    navController,
+                    navController = navController,
                 )
             }
         }
@@ -116,7 +119,9 @@ fun reformatList(
         if (searchValue.isNotBlank()) {
             var containsFilter = false
             for (product in store.products) {
-                if (product.name.contains(searchValue, true)) {
+                if (product.name.contains(
+                        other = searchValue,
+                        ignoreCase = true)) {
                     containsFilter = true
                 }
 
@@ -134,13 +139,13 @@ fun reformatList(
         }
 
         loader.start()
-        loaders.add(loader)
+        loaders.add(element = loader)
     }
     loaders.forEach { thread -> thread.join() }
 
     list.clear()
     for (entry in map) {
-        list.add(entry.value)
+        list.add(element = entry.value)
     }
 
     return list

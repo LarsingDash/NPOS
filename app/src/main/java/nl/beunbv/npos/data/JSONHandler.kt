@@ -23,9 +23,7 @@ class JSONHandler(
             val currentProduct = array[i] as JSONObject
 
             products.add(
-                Product(
-                    currentProduct["name"] as String
-                )
+                element = Product(name = currentProduct["name"] as String)
             )
         }
 
@@ -51,13 +49,13 @@ class JSONHandler(
             val closeList = (currentStore["close"] as String).split(':')
 
             stores.add(
-                Store(
-                    currentStore["id"] as Int,
-                    currentStore["name"] as String,
-                    GeoPoint(currentStore["lat"] as Double, currentStore["lon"] as Double),
-                    Pair(openList[0].toInt(), openList[1].toInt()),
-                    Pair(closeList[0].toInt(), closeList[1].toInt()),
-                    productsList
+                element = Store(
+                    id = currentStore["id"] as Int,
+                    name = currentStore["name"] as String,
+                    location = GeoPoint(currentStore["lat"] as Double, currentStore["lon"] as Double),
+                    openTime = Pair(openList[0].toInt(), openList[1].toInt()),
+                    closeTime = Pair(closeList[0].toInt(), closeList[1].toInt()),
+                    products = productsList
                 )
             )
         }

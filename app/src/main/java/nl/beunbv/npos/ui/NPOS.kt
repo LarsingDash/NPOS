@@ -71,8 +71,10 @@ fun NPOS() {
             composable(
                 route = Pages.Search.title,
             ) {
-                SearchScreen(MainActivity.unfoldedStore, navController)
-                BackHandler(true) {
+                SearchScreen(
+                    storeID = MainActivity.unfoldedStore,
+                    navController = navController)
+                BackHandler(enabled = true) {
                     if (MainActivity.unfoldedStore == -1) currentActivity.finish()
                     else {
                         navController.popBackStack()
@@ -88,8 +90,10 @@ fun NPOS() {
             ) {
                 val storeID = it.arguments?.getInt("storeID")
 
-                MapScreen(storeID!!, navController)
-                BackHandler(true) {
+                MapScreen(
+                    storeID = storeID!!,
+                    navController = navController)
+                BackHandler(enabled = true) {
                     if (storeID == 0) currentActivity.finish()
                     else {
                         navController.popBackStack()

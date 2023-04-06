@@ -38,18 +38,22 @@ fun StoreItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
-            .clip(RoundedCornerShape(25.dp, 25.dp, 25.01.dp, 25.dp))
+            .padding(all = 10.dp)
+            .clip(shape = RoundedCornerShape(
+                topStart = 25.dp,
+                topEnd = 25.dp,
+                bottomStart = 25.01.dp,
+                bottomEnd = 25.dp))
     ) {
         Column(
-            Modifier
+            modifier = Modifier
                 .animateContentSize(
                     animationSpec = spring(
                         dampingRatio = Spring.DampingRatioLowBouncy,
                         stiffness = Spring.StiffnessMedium
                     )
                 )
-                .background(Color.White),
+                .background(color = Color.White),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ListItemHeader(
@@ -58,7 +62,9 @@ fun StoreItem(
                 onFoldClick = onFoldClick,
             )
             if (isFoldedOut) {
-                ListItemBody(store, navController)
+                ListItemBody(
+                    store = store,
+                    navController = navController)
             }
         }
     }
@@ -70,7 +76,7 @@ fun ListItemHeader(
     isFoldedOut: Boolean,
     onFoldClick: () -> Unit,
 ) {
-    val color = if (isFoldedOut) Color(0xFF6200EE)
+    val color = if (isFoldedOut) Color(color = 0xFF6200EE)
     else Color.White
     val textCol = if (isFoldedOut) Color.White
     else Color.Black
@@ -78,11 +84,9 @@ fun ListItemHeader(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .height(75.dp)
-            .background(color)
-            .clickable {
-                onFoldClick.invoke()
-            },
+            .height(height = 75.dp)
+            .background(color = color)
+            .clickable { onFoldClick.invoke() },
         verticalArrangement = Arrangement.Center
     ) {
         Row(
@@ -91,7 +95,7 @@ fun ListItemHeader(
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.9f),
+                    .weight(weight = 0.9f),
                 text = text,
                 style = MaterialTheme.typography.h1,
                 color = textCol,
@@ -124,7 +128,7 @@ fun ListItemBody(
         modifier = Modifier
             .fillMaxSize()
             .clickable {
-                navController.navigate(Pages.Map.title + "/${store.id}")
+                navController.navigate(route = Pages.Map.title + "/${store.id}")
                 currentPage.value = Pages.Map.title
             },
         horizontalAlignment = Alignment.CenterHorizontally
@@ -132,22 +136,22 @@ fun ListItemBody(
         for (product in store.products) {
             Text(
                 text = product.name,
-                modifier = Modifier.padding(7.5.dp)
+                modifier = Modifier.padding(all = 7.5.dp)
             )
         }
 
         Box(
-            modifier = Modifier.padding(7.5.dp)
+            modifier = Modifier.padding(all = 7.5.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0xFF6200EE))
+                    .clip(shape = RoundedCornerShape(size = 10.dp))
+                    .background(color = Color(color = 0xFF6200EE))
             ) {
                 Text(
                     text = "Klik om te navigeren!",
                     color = Color.White,
-                    modifier = Modifier.padding(7.5.dp),
+                    modifier = Modifier.padding(all = 7.5.dp),
                     fontWeight = FontWeight.Bold
                 )
             }

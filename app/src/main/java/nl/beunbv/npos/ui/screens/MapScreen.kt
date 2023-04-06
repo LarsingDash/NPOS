@@ -31,24 +31,38 @@ fun MapScreen(
     navController: NavController,
 ) {
     val context = LocalContext.current
-    OSMMap(navController = navController, context)
+    OSMMap(navController = navController, context = context)
 
     val store = remember {
         mutableStateOf(if (storeID == -1) null else MainActivity.jsonHandler.stores[storeID])
     }
 
     if (store.value != null) {
-        addRouteToMap(MainActivity.userLocation, store.value!!.location, context)
-        recenter(store.value!!.location, true)
+        addRouteToMap(
+            user = MainActivity.userLocation,
+            store = store.value!!.location,
+            context = context)
+        recenter(
+            geoPoint = store.value!!.location,
+            isInstant = true)
     }
-    addStoreListToMap(MainActivity.jsonHandler.stores, context)
+    addStoreListToMap(
+        StoreList = MainActivity.jsonHandler.stores,
+        context = context)
 
-    updateUserLocation(MainActivity.userLocation, context)
+    updateUserLocation(
+        geoPoint = MainActivity.userLocation,
+        context = context)
     MainActivity.locationUpdateCallback = { newLocation ->
-        updateUserLocation(newLocation, context)
+        updateUserLocation(
+            geoPoint = newLocation,
+            context = context)
 
         if (store.value != null) {
-            if (addRouteToMap(newLocation, store.value!!.location, context)) {
+            if (addRouteToMap(
+                    user = newLocation,
+                    store = store.value!!.location,
+                    context = context)) {
                 store.value = null
             }
         }
@@ -62,15 +76,23 @@ fun MapScreen(
         //User
         Box(
             modifier = Modifier
-                .weight(weight)
-                .padding(10.dp, 10.dp, 5.dp, 0.dp)
-                .clip(RoundedCornerShape(7.5.dp))
-                .background(Color(0xFF6200EE))
-                .clickable { recenter(MainActivity.userLocation, false) },
+                .weight(weight = weight)
+                .padding(
+                    start = 10.dp,
+                    top = 10.dp,
+                    end = 5.dp,
+                    bottom = 0.dp)
+                .clip(shape = RoundedCornerShape(size = 7.5.dp))
+                .background(color = Color(color = 0xFF6200EE))
+                .clickable { recenter(
+                    geoPoint = MainActivity.userLocation,
+                    isInstant = false) },
             contentAlignment = Alignment.Center
         ) {
             Text(
-                modifier = Modifier.padding(10.dp, 5.dp),
+                modifier = Modifier.padding(
+                    horizontal = 10.dp,
+                    vertical = 5.dp),
                 textAlign = TextAlign.Center,
                 text = "Centreer mij",
                 color = Color.White,
@@ -83,20 +105,28 @@ fun MapScreen(
             //Store
             Box(
                 modifier = Modifier
-                    .weight(weight)
-                    .padding(5.dp, 10.dp, 10.dp, 0.dp)
-                    .clip(RoundedCornerShape(7.5.dp))
-                    .background(Color(0xFF6200EE))
+                    .weight(weight = weight)
+                    .padding(
+                        start = 5.dp,
+                        top = 10.dp,
+                        end = 10.dp,
+                        bottom = 0.dp)
+                    .clip(shape = RoundedCornerShape(size = 7.5.dp))
+                    .background(color = Color(color = 0xFF6200EE))
                     .clickable {
                         if (store.value != null) {
                             val temp = store.value as Store
-                            recenter(temp.location, false)
+                            recenter(
+                                geoPoint = temp.location,
+                                isInstant = false)
                         }
                     },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    modifier = Modifier.padding(10.dp, 5.dp),
+                    modifier = Modifier.padding(
+                        horizontal = 10.dp,
+                        vertical = 5.dp),
                     textAlign = TextAlign.Center,
                     text = "Centreer winkel",
                     color = Color.White,

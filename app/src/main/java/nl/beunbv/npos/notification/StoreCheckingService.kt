@@ -14,7 +14,7 @@ class StoreCheckingService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        NotificationHandler.init(this)
+        NotificationHandler.init(context = this)
 
         Log.println(Log.DEBUG, "DEBUG", "Started service thread")
 
@@ -23,10 +23,15 @@ class StoreCheckingService : Service() {
 
             while (isRunning) {
                 val localDateTime = LocalDateTime.now()
-                val currentTime = Pair(localDateTime.hour, localDateTime.minute)
+                val currentTime = Pair(
+                    first = localDateTime.hour,
+                    second = localDateTime.minute)
 
                 for (store in stores) {
-                    checkTime(store, currentTime, this)
+                    checkTime(
+                        store = store,
+                        currentTime = currentTime,
+                        context = this)
                 }
 
 //                Thread.sleep(3000)
@@ -54,13 +59,25 @@ class StoreCheckingService : Service() {
             currentTime: Pair<Int, Int>,
             context: Context?
         ): Boolean {
-            if (compareTimes(store.openTime, currentTime)) {
+            if (compareTimes(
+                    store = store.openTime,
+                    now = currentTime)) {
                 if (context != null)
-                    NotificationHandler.postMessage(store.name, store.id, true, context)
+                    NotificationHandler.postMessage(
+                        storeName = store.name,
+                        storeID = store.id,
+                        wentOpen = true,
+                        context = context)
                 return true
-            } else if (compareTimes(store.closeTime, currentTime)) {
+            } else if (compareTimes(
+                    store = store.closeTime,
+                    now = currentTime)) {
                 if (context != null)
-                    NotificationHandler.postMessage(store.name, store.id, false, context)
+                    NotificationHandler.postMessage(
+                        storeName = store.name,
+                        storeID = store.id,
+                        wentOpen = false,
+                        context = context)
                 return true
             }
 

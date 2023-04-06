@@ -18,22 +18,22 @@ class JSONHandlerTest {
     @Test
     fun readStoresTest() {
         val jsonHandler = JSONHandler(
-            testContext.resources.openRawResource(R.raw.test_products),
-            testContext.resources.openRawResource(R.raw.test_stores),
+            productsStream = testContext.resources.openRawResource(R.raw.test_products),
+            storesStream = testContext.resources.openRawResource(R.raw.test_stores),
         )
 
         val stores = jsonHandler.stores
         val expectedList = listOf(stores[0], stores[1], stores[2])
         val expectedNames = arrayListOf<String>()
         for (store in expectedList) {
-            expectedNames.add(store.name)
+            expectedNames.add(element = store.name)
         }
 
         val readList =
-            jsonHandler.readStores(testContext.resources.openRawResource(R.raw.test_stores))
+            jsonHandler.readStores(stream = testContext.resources.openRawResource(R.raw.test_stores))
         val readNames = arrayListOf<String>()
         for (store in readList) {
-            readNames.add(store.name)
+            readNames.add(element = store.name)
         }
 
         assertEquals(expectedNames, readNames)
@@ -42,16 +42,16 @@ class JSONHandlerTest {
     @Test
     fun readProductsTest() {
         val jsonHandler = JSONHandler(
-            testContext.resources.openRawResource(R.raw.test_products),
-            testContext.resources.openRawResource(R.raw.test_stores),
+            productsStream = testContext.resources.openRawResource(R.raw.test_products),
+            storesStream = testContext.resources.openRawResource(R.raw.test_stores),
         )
 
         val expectedNames = arrayListOf("Product - 0", "Product - 1", "Product - 2")
         val readList =
-            jsonHandler.readProducts(testContext.resources.openRawResource(R.raw.test_products))
+            jsonHandler.readProducts(stream = testContext.resources.openRawResource(R.raw.test_products))
         val readNames = arrayListOf<String>()
         for (product in readList) {
-            readNames.add(product.name)
+            readNames.add(element = product.name)
         }
 
         assertEquals(expectedNames, readNames)

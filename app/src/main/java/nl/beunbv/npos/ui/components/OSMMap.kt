@@ -49,7 +49,7 @@ fun OSMMap(
 
     storeOverlay = createStoreOverlay(
         context = context,
-        navController
+        navController = navController
     )
 
     AndroidView(
@@ -63,7 +63,7 @@ fun OSMMap(
                 controller.setCenter(MainActivity.userLocation)
                 controller.setZoom(17.0)
 
-                mapView.overlays.add(storeOverlay)
+                mapView.overlays.add(element = storeOverlay)
             }
         },
     )
@@ -82,7 +82,7 @@ private fun createStoreOverlay(
             override fun onItemSingleTapUp(index: Int, item: StoreOverlayItem?): Boolean {
                 item?.store?.let {
                     MainActivity.unfoldedStore = it.id
-                    navController.navigate(Pages.Search.title)
+                    navController.navigate(route = Pages.Search.title)
                     currentPage.value = Pages.Search.title
                 }
                 return true
@@ -111,14 +111,12 @@ fun addStoreListToMap(
     storeOverlay.removeAllItems()
 
     for (store in StoreList) {
-        storeOverlay.addItem(
-            StoreOverlayItem(store, store.name)
-        )
+        storeOverlay.addItem(StoreOverlayItem(store, store.name))
 
-        if (store.name.contains("Jumbo", true)) {
+        if (store.name.contains(other = "Jumbo", ignoreCase = true)) {
             storeOverlay.getItem(storeOverlay.size() - 1)
                 .setMarker(context.getDrawable(R.drawable.jumbo))
-        } else if (store.name.contains("Coop", true)) {
+        } else if (store.name.contains(other = "Coop", ignoreCase = true)) {
             storeOverlay.getItem(storeOverlay.size() - 1)
                 .setMarker(context.getDrawable(R.drawable.coop))
         }
@@ -129,7 +127,7 @@ fun addStoreListToMap(
 
 fun addRouteToMap(user: GeoPoint, store: GeoPoint, context: Context): Boolean {
     var hasFinished = false
-    mapView.overlays.remove(routeOverlay)
+    mapView.overlays.remove(element = routeOverlay)
 
     val loader = Thread {
         //Creation
@@ -146,7 +144,9 @@ fun addRouteToMap(user: GeoPoint, store: GeoPoint, context: Context): Boolean {
             hasFinished = true
         } else {
             //Add the overlay to all overlays
-            mapView.overlays.add(0, routeOverlay)
+            mapView.overlays.add(
+                index = 0,
+                element = routeOverlay)
             mapView.invalidate()
         }
     }
@@ -157,9 +157,9 @@ fun addRouteToMap(user: GeoPoint, store: GeoPoint, context: Context): Boolean {
 }
 
 fun updateUserLocation(geoPoint: GeoPoint, context: Context) {
-    mapView.overlays.remove(locationOverlay)
+    mapView.overlays.remove(element = locationOverlay)
     locationOverlay = IconOverlay(geoPoint, context.getDrawable(R.drawable.user))
-    mapView.overlays.add(locationOverlay)
+    mapView.overlays.add(element = locationOverlay)
     mapView.invalidate()
 }
 

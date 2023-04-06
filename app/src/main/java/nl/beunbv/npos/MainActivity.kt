@@ -36,11 +36,11 @@ class MainActivity : ComponentActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         jsonHandler = JSONHandler(
-            resources.openRawResource(R.raw.products),
-            resources.openRawResource(R.raw.stores),
+            productsStream = resources.openRawResource(R.raw.products),
+            storesStream = resources.openRawResource(R.raw.stores),
         )
 
-        setupUserLocation(this)
+        setupUserLocation(context = this)
 
         val intent = Intent(this, StoreCheckingService::class.java)
         startService(intent)

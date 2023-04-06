@@ -12,40 +12,40 @@ class StoreCheckingServiceTest {
         //Same hour positive
         assertEquals(
             true, StoreCheckingService.compareTimes(
-                Pair(10, 30),
-                Pair(10, 20)
+                store = Pair(first = 10, second = 30),
+                now = Pair(first = 10, second = 20)
             )
         )
 
         //Same hour negative
         assertEquals(
             false, StoreCheckingService.compareTimes(
-                Pair(10, 30),
-                Pair(10, 21)
+                store = Pair(first = 10, second = 30),
+                now = Pair(first = 10, second = 21)
             )
         )
 
         //Different hour positive
         assertEquals(
             true, StoreCheckingService.compareTimes(
-                Pair(11, 0),
-                Pair(10, 50)
+                store = Pair(first = 11, second = 0),
+                now = Pair(first = 10, second = 50)
             )
         )
 
         //Different hour negative - 1
         assertEquals(
             false, StoreCheckingService.compareTimes(
-                Pair(11, 0),
-                Pair(10, 51)
+                store = Pair(first = 11, second = 0),
+                now = Pair(first = 10, second = 51)
             )
         )
 
         //Different hour negative - 2
         assertEquals(
             false, StoreCheckingService.compareTimes(
-                Pair(11, 0),
-                Pair(10, 0)
+                store = Pair(first = 11, second = 0),
+                now = Pair(first = 10, second = 0)
             )
         )
     }
@@ -53,47 +53,47 @@ class StoreCheckingServiceTest {
     @Test
     fun checkTimeTest() {
         val testStore = Store(
-            0,
-            "",
-            GeoPoint(0.0, 0.0),
-            Pair(12, 34),
-            Pair(21, 0),
-            listOf()
+            id = 0,
+            name = "",
+            location = GeoPoint(0.0, 0.0),
+            openTime = Pair(first = 12, second = 34),
+            closeTime = Pair(first = 21, second = 0),
+            products = listOf()
         )
 
         //Open positive
         assertEquals(
             true, StoreCheckingService.checkTime(
-                testStore,
-                Pair(12, 24),
-                null
+                store = testStore,
+                currentTime = Pair(first = 12, second = 24),
+                context = null
             )
         )
 
         //Open negative
         assertEquals(
             false, StoreCheckingService.checkTime(
-                testStore,
-                Pair(11, 24),
-                null
+                store = testStore,
+                currentTime = Pair(first = 11, second = 24),
+                context = null
             )
         )
 
         //Close positive
         assertEquals(
             true, StoreCheckingService.checkTime(
-                testStore,
-                Pair(20, 50),
-                null
+                store = testStore,
+                currentTime = Pair(first = 20, second = 50),
+                context = null
             )
         )
 
         //Close positive
         assertEquals(
             false, StoreCheckingService.checkTime(
-                testStore,
-                Pair(21, 50),
-                null
+                store = testStore,
+                currentTime = Pair(first = 21, second = 50),
+                context = null
             )
         )
     }

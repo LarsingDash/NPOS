@@ -38,8 +38,8 @@ class NotificationHandler {
             val builder = NotificationCompat.Builder(context, channelID)
                 .setSmallIcon(
                     when {
-                        storeName.contains("Jumbo") -> R.drawable.jumbo
-                        storeName.contains("Coop") -> R.drawable.coop
+                        storeName.contains(other = "Jumbo") -> R.drawable.jumbo
+                        storeName.contains(other = "Coop") -> R.drawable.coop
                         else -> R.drawable.albert_heijn
                     }
                 )
