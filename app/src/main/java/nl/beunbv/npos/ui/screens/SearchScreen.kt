@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.*
 import nl.beunbv.npos.MainActivity
 import nl.beunbv.npos.data.Store
 import nl.beunbv.npos.ui.components.StoreItem
@@ -25,6 +26,7 @@ import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import java.util.*
+import kotlin.collections.ArrayList
 
 lateinit var fullList: MutableState<List<Store>>
 lateinit var searchBarValue: MutableState<TextFieldValue>
@@ -80,10 +82,13 @@ fun SearchScreen(
 
         LazyColumn(
             modifier = Modifier
-                .background(color = Color(
-                    red = 240,
-                    green = 240,
-                    blue = 240))
+                .background(
+                    color = Color(
+                        red = 240,
+                        green = 240,
+                        blue = 240
+                    )
+                )
                 .fillMaxHeight()
         ) {
             items(count = searchList.size) { index ->
@@ -115,34 +120,41 @@ fun reformatList(
     userLocation: GeoPoint
 ): List<Store> {
     val map = TreeMap<Double, Store>()
-    val loaders = arrayListOf<Thread>()
-    list.forEach { store ->
-        if (searchValue.isNotBlank()) {
-            var containsFilter = false
-            for (product in store.products) {
-                if (product.name.contains(
-                        other = searchValue,
-                        ignoreCase = true)) {
-                    containsFilter = true
+    val loaders = ArrayList<Job>()
+
+    runBlocking {
+        list.forEach { store ->
+            if (searchValue.isNotBlank()) {
+                var containsFilter = false
+
+                run breaking@{
+                    store.products.forEach { product ->
+                        if (product.name.contains(
+                                other = searchValue,
+                                ignoreCase = true
+                            )
+                        ) {
+                            containsFilter = true
+                            return@breaking
+                        }
+                    }
                 }
 
-                continue
+                if (!containsFilter) return@forEach
             }
-            if (!containsFilter) return@forEach
+
+            val loader = launch(Dispatchers.IO) {
+                val road = roadManager.getRoad(
+                    arrayListOf(userLocation, store.location)
+                )
+
+                map[road.mLength] = store
+            }
+            loaders.add(loader)
         }
 
-        val loader = Thread {
-            val road = roadManager.getRoad(
-                arrayListOf(userLocation, store.location)
-            )
-
-            map[road.mLength] = store
-        }
-
-        loader.start()
-        loaders.add(element = loader)
+        loaders.forEach { job -> job.join()}
     }
-    loaders.forEach { thread -> thread.join() }
 
     list.clear()
     map.forEach { entry -> list.add(element = entry.value) }

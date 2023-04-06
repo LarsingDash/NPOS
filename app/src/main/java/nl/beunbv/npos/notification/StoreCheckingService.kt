@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
+import kotlinx.coroutines.*
 import nl.beunbv.npos.MainActivity
 import nl.beunbv.npos.data.Store
 import java.time.LocalDateTime
@@ -18,26 +19,29 @@ class StoreCheckingService : Service() {
 
         Log.println(Log.DEBUG, "DEBUG", "Started service thread")
 
-        Thread {
+        val context = this
+        GlobalScope.launch(Dispatchers.IO) {
             val stores = MainActivity.jsonHandler.stores
 
             while (isRunning) {
                 val localDateTime = LocalDateTime.now()
                 val currentTime = Pair(
                     first = localDateTime.hour,
-                    second = localDateTime.minute)
+                    second = localDateTime.minute
+                )
 
                 stores.forEach { store ->
                     checkTime(
                         store = store,
                         currentTime = currentTime,
-                        context = this)
+                        context = context
+                    )
                 }
 
-//                Thread.sleep(3000)
-                Thread.sleep(60000)
+//                delay(3000L)
+                delay(60000L)
             }
-        }.start()
+        }
 
         return START_NOT_STICKY
     }

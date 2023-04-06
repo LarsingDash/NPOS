@@ -12,6 +12,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
+import kotlinx.coroutines.runBlocking
 import nl.beunbv.npos.MainActivity
 import nl.beunbv.npos.R
 import nl.beunbv.npos.data.Store
@@ -129,7 +130,7 @@ fun addRouteToMap(user: GeoPoint, store: GeoPoint, context: Context): Boolean {
     var hasFinished = false
     mapView.overlays.remove(element = routeOverlay)
 
-    val loader = Thread {
+    runBlocking {
         //Creation
         val road = roadManager.getRoad(arrayListOf<GeoPoint>(user, store))
         routeOverlay = RoadManager.buildRoadOverlay(road)
@@ -151,8 +152,6 @@ fun addRouteToMap(user: GeoPoint, store: GeoPoint, context: Context): Boolean {
         }
     }
 
-    loader.start()
-    loader.join()
     return hasFinished
 }
 
