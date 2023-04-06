@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
 
                     //Update locations
                     val location = result.lastLocation
-                    if (location != null) {
+                    location?.let {
                         val geoLocation = GeoPoint(location.latitude, location.longitude)
                         userLocation = geoLocation
 

@@ -59,30 +59,32 @@ class StoreCheckingService : Service() {
             currentTime: Pair<Int, Int>,
             context: Context?
         ): Boolean {
-            if (store.openTime.compareTimes(
-                    now = currentTime)) {
-                if (context != null)
+            if (store.openTime.compareTimes(now = currentTime)) {
+                context?.let {
                     NotificationHandler.postMessage(
                         storeName = store.name,
                         storeID = store.id,
                         message = Messages.OPEN,
-                        context = context)
+                        context = context
+                    )
+                }
                 return true
-            } else if (store.closeTime.compareTimes(
-                    now = currentTime)) {
-                if (context != null)
+            } else if (store.closeTime.compareTimes(now = currentTime)) {
+                context?.let {
                     NotificationHandler.postMessage(
                         storeName = store.name,
                         storeID = store.id,
                         message = Messages.CLOSE,
-                        context = context)
+                        context = context
+                    )
+                }
                 return true
             }
 
             return false
         }
 
-        private fun Pair<Int, Int>.compareTimes(now: Pair<Int, Int>): Boolean {
+        fun Pair<Int, Int>.compareTimes(now: Pair<Int, Int>): Boolean {
             if (this.first == now.first) {
                 if (this.second - now.second == 10) {
                     return true

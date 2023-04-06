@@ -39,7 +39,7 @@ fun MapScreen(
         mutableStateOf(if (storeID == -1) null else MainActivity.jsonHandler.stores[storeID])
     }
 
-    if (store.value != null) {
+    store.value?.let {
         addRouteToMap(
             user = MainActivity.userLocation,
             store = store.value!!.location,
@@ -60,7 +60,7 @@ fun MapScreen(
             geoPoint = newLocation,
             context = context)
 
-        if (store.value != null) {
+        store.value?.let {
             if (addRouteToMap(
                     user = newLocation,
                     store = store.value!!.location,
@@ -74,7 +74,7 @@ fun MapScreen(
                         context = context
                     )
                 }
-                
+
                 store.value = null
             }
         }
@@ -83,7 +83,7 @@ fun MapScreen(
     Row(
         modifier = Modifier.fillMaxSize(),
     ) {
-        val weight = if (store.value != null) 0.5f else 1f
+        val weight = store.value?.let { 0.5f } ?: run { 1f }
 
         //User
         Box(
@@ -113,7 +113,7 @@ fun MapScreen(
             )
         }
 
-        if (store.value != null) {
+        store.value?.let {
             //Store
             Box(
                 modifier = Modifier
@@ -126,7 +126,7 @@ fun MapScreen(
                     .clip(shape = RoundedCornerShape(size = 7.5.dp))
                     .background(color = Color(color = 0xFF6200EE))
                     .clickable {
-                        if (store.value != null) {
+                        store.value?.let  {
                             val temp = store.value as Store
                             recenter(
                                 geoPoint = temp.location,

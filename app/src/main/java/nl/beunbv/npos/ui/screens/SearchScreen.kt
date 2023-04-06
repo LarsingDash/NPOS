@@ -90,8 +90,8 @@ fun SearchScreen(
                 val store = searchList[index]
 
                 var foldout = false
-                if (openedStore != null && openedStore == store) foldout = true
-                if (preOpenedStoreID != null && preOpenedStoreID == store.id) foldout = true
+                openedStore?.let { if (openedStore == store) foldout = true }
+                preOpenedStoreID?.let { if (preOpenedStoreID == store.id) foldout = true }
 
                 StoreItem(
                     store = store,
