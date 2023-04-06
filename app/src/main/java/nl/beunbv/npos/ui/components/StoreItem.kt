@@ -28,6 +28,7 @@ import nl.beunbv.npos.data.Store
 import nl.beunbv.npos.ui.Pages
 import nl.beunbv.npos.ui.currentPage
 
+//ui for Store Item on the search page
 @Composable
 fun StoreItem(
     store: Store,
@@ -35,17 +36,22 @@ fun StoreItem(
     isFoldedOut: Boolean,
     navController: NavController,
 ) {
+    //Main card
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(all = 10.dp)
-            .clip(shape = RoundedCornerShape(
-                topStart = 25.dp,
-                topEnd = 25.dp,
-                bottomStart = 25.01.dp,
-                bottomEnd = 25.dp))
+            .clip(
+                shape = RoundedCornerShape(
+                    topStart = 25.dp,
+                    topEnd = 25.dp,
+                    bottomStart = 25.01.dp,
+                    bottomEnd = 25.dp
+                )
+            )
     ) {
         Column(
+            //Modifier for foldout animation
             modifier = Modifier
                 .animateContentSize(
                     animationSpec = spring(
@@ -56,31 +62,35 @@ fun StoreItem(
                 .background(color = Color.White),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            //Header
             ListItemHeader(
                 text = store.name,
                 isFoldedOut = isFoldedOut,
                 onFoldClick = onFoldClick,
             )
+            //Body if folded out
             if (isFoldedOut) {
                 ListItemBody(
                     store = store,
-                    navController = navController)
+                    navController = navController
+                )
             }
         }
     }
 }
 
+//Header of store item card
 @Composable
 fun ListItemHeader(
     text: String,
     isFoldedOut: Boolean,
     onFoldClick: () -> Unit,
 ) {
-    val color = if (isFoldedOut) Color(color = 0xFF6200EE)
-    else Color.White
-    val textCol = if (isFoldedOut) Color.White
-    else Color.Black
+    //Decide color pallet, dependent on isFoldedOut
+    val color = if (isFoldedOut) Color(color = 0xFF6200EE) else Color.White
+    val textCol = if (isFoldedOut) Color.White else Color.Black
 
+    //Main column, invokes click Unit
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -89,9 +99,11 @@ fun ListItemHeader(
             .clickable { onFoldClick.invoke() },
         verticalArrangement = Arrangement.Center
     ) {
+        //Wrapper row for centralization
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
+            //Store Name
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -104,6 +116,7 @@ fun ListItemHeader(
                 textAlign = TextAlign.Center,
             )
 
+            //Fold in or out arrow
             if (isFoldedOut) {
                 Icon(
                     imageVector = Icons.Filled.ExpandLess,
@@ -119,11 +132,13 @@ fun ListItemHeader(
     }
 }
 
+//Body of store item card
 @Composable
 fun ListItemBody(
     store: Store,
     navController: NavController,
 ) {
+    //Main column, Navigates the corresponding store to map when clicked
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -133,6 +148,7 @@ fun ListItemBody(
             },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        //List all products
         for (product in store.products) {
             Text(
                 text = product.name,
@@ -140,6 +156,7 @@ fun ListItemBody(
             )
         }
 
+        //Fake "Click here!" box, the whole body is clickable
         Box(
             modifier = Modifier.padding(all = 7.5.dp)
         ) {

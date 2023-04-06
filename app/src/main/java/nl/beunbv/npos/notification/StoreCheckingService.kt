@@ -1,68 +1,64 @@
 package nl.beunbv.npos.notification
 
-import android.app.Service
 import android.content.Context
-import android.content.Intent
-import android.os.IBinder
 import android.util.Log
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import nl.beunbv.npos.MainActivity
 import nl.beunbv.npos.data.Store
 import java.time.LocalDateTime
 
-class StoreCheckingService : Service() {
-    private var isRunning = true
+class StoreCheckingService {
+    companion object {
+        private var isRunning = true
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
-        NotificationHandler.init(context = this)
+        //Initiate background coroutine to keep track of store times
+        fun initStoreCheckingService(
+            context: Context
+        ) {
+            //Initiate notification handler
+            NotificationHandler.init(context = context)
 
-        Log.println(Log.DEBUG, "DEBUG", "Started service thread")
+            //Start Coroutine
+            GlobalScope.launch(Dispatchers.IO) {
+                val stores = MainActivity.jsonHandler.stores
 
-        val context = this
-        GlobalScope.launch(Dispatchers.IO) {
-            val stores = MainActivity.jsonHandler.stores
-
-            while (isRunning) {
-                val localDateTime = LocalDateTime.now()
-                val currentTime = Pair(
-                    first = localDateTime.hour,
-                    second = localDateTime.minute
-                )
-
-                stores.forEach { store ->
-                    checkTime(
-                        store = store,
-                        currentTime = currentTime,
-                        context = context
+                //Loop every minute
+                while (isRunning) {
+                    //Get and convert the current time to a Pair format
+                    val localDateTime = LocalDateTime.now()
+                    val currentTime = Pair(
+                        first = localDateTime.hour,
+                        second = localDateTime.minute
                     )
-                }
 
-//                delay(3000L)
-                delay(60000L)
+                    //Use the current time Pair to compare against store times
+                    stores.forEach { store ->
+                        //Send notification at certain times
+                        checkTime(
+                            store = store,
+                            currentTime = currentTime,
+                            context = context
+                        )
+                    }
+
+//                    delay(3000L)
+                    delay(60000L)
+                }
             }
+
+            Log.println(Log.DEBUG, "DEBUG", "Started service thread")
         }
 
-        return START_NOT_STICKY
-    }
-
-    override fun onDestroy() {
-        isRunning = false
-        Log.println(Log.DEBUG, "DEBUG", "Stopped service thread")
-
-        super.onDestroy()
-    }
-
-    override fun onBind(p0: Intent?): IBinder? {
-        return null
-    }
-
-    companion object {
+        //Checks the time of a given store and sends a notification if necessary
         fun checkTime(
             store: Store,
             currentTime: Pair<Int, Int>,
             context: Context?
         ): Boolean {
+            //Opening time
             if (store.openTime.compareTimes(now = currentTime)) {
                 context?.let {
                     NotificationHandler.postMessage(
@@ -73,29 +69,35 @@ class StoreCheckingService : Service() {
                     )
                 }
                 return true
-            } else if (store.closeTime.compareTimes(now = currentTime)) {
-                context?.let {
-                    NotificationHandler.postMessage(
-                        storeName = store.name,
-                        storeID = store.id,
-                        message = Messages.CLOSE,
-                        context = context
-                    )
+            } else
+            //Closing time
+                if (store.closeTime.compareTimes(now = currentTime)) {
+                    context?.let {
+                        NotificationHandler.postMessage(
+                            storeName = store.name,
+                            storeID = store.id,
+                            message = Messages.CLOSE,
+                            context = context
+                        )
+                    }
+                    return true
                 }
-                return true
-            }
 
             return false
         }
 
+        //Finds out if the given store time (this) is 10 minutes away from the "now" time
         fun Pair<Int, Int>.compareTimes(now: Pair<Int, Int>): Boolean {
+            //Same hour
             if (this.first == now.first) {
                 if (this.second - now.second == 10) {
                     return true
                 }
-            } else if (this.first - now.first == 1 && now.second == 50) {
-                return true
-            }
+            } else
+            //Only 50 min is required because of the data in the database
+                if (this.first - now.first == 1 && now.second == 50) {
+                    return true
+                }
 
             return false
         }

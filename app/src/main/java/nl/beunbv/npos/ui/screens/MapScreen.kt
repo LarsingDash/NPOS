@@ -33,39 +33,63 @@ fun MapScreen(
     navController: NavController,
 ) {
     val context = LocalContext.current
+
+    //Initialize OSMMap component
     OSMMap(navController = navController, context = context)
 
+    //Remember selected store? that could have been passed through as a navigational argument
+    //Null means no route is active
     val store = remember {
         mutableStateOf(if (storeID == -1) null else MainActivity.jsonHandler.stores[storeID])
     }
 
+    //If a store was passed through, that means a route should be started
     store.value?.let {
+        //Create route
         addRouteToMap(
             user = MainActivity.userLocation,
             store = store.value!!.location,
-            context = context)
+            context = context
+        )
+
+        //Center map to destination (store)
         recenter(
             geoPoint = store.value!!.location,
-            isInstant = true)
+            isInstant = true
+        )
     }
+
+    //Add all stores to map
     addStoreListToMap(
         StoreList = MainActivity.jsonHandler.stores,
-        context = context)
+        context = context
+    )
 
+    //Add / update user on the map
     updateUserLocation(
         geoPoint = MainActivity.userLocation,
-        context = context)
+        context = context
+    )
+
+    //Subscribe to callback from locationProvider
     MainActivity.locationUpdateCallback = { newLocation ->
+        //Update user location when a new location is received
         updateUserLocation(
             geoPoint = newLocation,
-            context = context)
+            context = context
+        )
 
+        //If a route was active: add / refresh it on the map
         store.value?.let {
+            //Returns true when route has been finished
             if (addRouteToMap(
                     user = newLocation,
                     store = store.value!!.location,
-                    context = context)) {
+                    context = context
+                )
+            ) {
 
+                //Push notification of the route being finished
                 store.value?.let {
                     NotificationHandler.postMessage(
                         storeName = it.name,
@@ -75,17 +99,20 @@ fun MapScreen(
                     )
                 }
 
+                //Clear selected store
                 store.value = null
             }
         }
     }
 
+    //Main ui
     Row(
         modifier = Modifier.fillMaxSize(),
     ) {
+        //If no route is selected: "center me" button fullscreen, otherwise split evenly
         val weight = store.value?.let { 0.5f } ?: run { 1f }
 
-        //User
+        //"Center me" button
         Box(
             modifier = Modifier
                 .weight(weight = weight)
@@ -93,18 +120,24 @@ fun MapScreen(
                     start = 10.dp,
                     top = 10.dp,
                     end = 5.dp,
-                    bottom = 0.dp)
+                    bottom = 0.dp
+                )
                 .clip(shape = RoundedCornerShape(size = 7.5.dp))
                 .background(color = Color(color = 0xFF6200EE))
-                .clickable { recenter(
-                    geoPoint = MainActivity.userLocation,
-                    isInstant = false) },
+                .clickable {
+                    //Center user on mapView
+                    recenter(
+                        geoPoint = MainActivity.userLocation,
+                        isInstant = false
+                    )
+                },
             contentAlignment = Alignment.Center
         ) {
             Text(
                 modifier = Modifier.padding(
                     horizontal = 10.dp,
-                    vertical = 5.dp),
+                    vertical = 5.dp
+                ),
                 textAlign = TextAlign.Center,
                 text = "Centreer mij",
                 color = Color.White,
@@ -113,8 +146,8 @@ fun MapScreen(
             )
         }
 
+        //If a route is active: display "Center store" button
         store.value?.let {
-            //Store
             Box(
                 modifier = Modifier
                     .weight(weight = weight)
@@ -122,15 +155,18 @@ fun MapScreen(
                         start = 5.dp,
                         top = 10.dp,
                         end = 10.dp,
-                        bottom = 0.dp)
+                        bottom = 0.dp
+                    )
                     .clip(shape = RoundedCornerShape(size = 7.5.dp))
                     .background(color = Color(color = 0xFF6200EE))
                     .clickable {
-                        store.value?.let  {
+                        store.value?.let {
+                            //Center selected store on mapView
                             val temp = store.value as Store
                             recenter(
                                 geoPoint = temp.location,
-                                isInstant = false)
+                                isInstant = false
+                            )
                         }
                     },
                 contentAlignment = Alignment.Center
@@ -138,7 +174,8 @@ fun MapScreen(
                 Text(
                     modifier = Modifier.padding(
                         horizontal = 10.dp,
-                        vertical = 5.dp),
+                        vertical = 5.dp
+                    ),
                     textAlign = TextAlign.Center,
                     text = "Centreer winkel",
                     color = Color.White,

@@ -21,6 +21,7 @@ class NotificationHandler {
         private lateinit var manager: NotificationManager
         private const val channelID = "NPOS"
 
+        //Sets up the notification channel in Android
         fun init(context: Context) {
             manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -35,18 +36,24 @@ class NotificationHandler {
             manager.createNotificationChannel(channel)
         }
 
+        //Push a notification
         fun postMessage(
             storeName: String,
             storeID: Int,
             message: Messages,
             context: Context
         ) {
+            //Decide what text the notification will have according to the given enum Messages
             val text: String =
+                //Arrival
                 if (message == Messages.ARRIVE) "Je hebt $storeName berijkt!"
+                //Open / Close
                 else "$storeName zal over 10 minuten ${
                     if (message.wentOpen)
                         "openen" else "sluiten"
                 }!"
+
+            //Build the notification
             val builder = NotificationCompat.Builder(context, channelID)
                 .setSmallIcon(
                     when {
@@ -65,6 +72,7 @@ class NotificationHandler {
                     )
                 )
 
+            //Push the notification
             manager.notify(storeID, builder.build())
         }
     }

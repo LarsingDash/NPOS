@@ -13,6 +13,7 @@ class JSONHandler(
     private val products: List<Product> = readProducts(productsStream)
     val stores: List<Store> = readStores(storesStream)
 
+    //Reads products from the given InputStream (raw JSON)
     fun readProducts(stream: InputStream): List<Product> {
         val reader = InputStreamReader(stream)
         val array = JSONArray(JSONObject(reader.readText())["products"].toString())
@@ -30,6 +31,7 @@ class JSONHandler(
         return products
     }
 
+    //Reads stores from the given InputStream (raw JSON)
     fun readStores(stream: InputStream): List<Store> {
         val reader = InputStreamReader(stream)
         val array = JSONArray(JSONObject(reader.readText())["stores"].toString())
@@ -52,7 +54,10 @@ class JSONHandler(
                 element = Store(
                     id = currentStore["id"] as Int,
                     name = currentStore["name"] as String,
-                    location = GeoPoint(currentStore["lat"] as Double, currentStore["lon"] as Double),
+                    location = GeoPoint(
+                        currentStore["lat"] as Double,
+                        currentStore["lon"] as Double
+                    ),
                     openTime = Pair(openList[0].toInt(), openList[1].toInt()),
                     closeTime = Pair(closeList[0].toInt(), closeList[1].toInt()),
                     products = productsList

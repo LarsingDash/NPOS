@@ -41,21 +41,26 @@ fun OSMMap(
     navController: NavController,
     context: Context,
 ) {
+    //Setup mapView
     mapView = remember { MapView(context) }
     mapView.setMultiTouchControls(true)
     mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
 
+    //Setup roadManager
     roadManager = OSRMRoadManager(context, Configuration.getInstance().userAgentValue)
     (roadManager as OSRMRoadManager).setMean(OSRMRoadManager.MEAN_BY_FOOT)
 
+    //Setup storeOverlay
     storeOverlay = createStoreOverlay(
         context = context,
         navController = navController
     )
 
+    //Setup Map/Android View
     AndroidView(
         modifier = Modifier.fillMaxSize(),
         factory = {
+            //Configure mapView settings
             mapView.apply {
                 minZoomLevel = 12.5
                 maxZoomLevel = 20.0
@@ -64,11 +69,13 @@ fun OSMMap(
                 controller.setCenter(MainActivity.userLocation)
                 controller.setZoom(17.0)
 
+                //Add storeOverlay
                 mapView.overlays.add(element = storeOverlay)
             }
         },
     )
 
+    //Define lifecycle of mapView
     MapLifecycle(mapView = mapView)
 }
 
@@ -105,15 +112,20 @@ private fun createStoreOverlay(
     }
 }
 
+//Adds the given StoreList to the storeOverlay and refreshes the map
 fun addStoreListToMap(
     StoreList: List<Store>,
     context: Context,
 ) {
+    //Clear overlay
     storeOverlay.removeAllItems()
 
+    //Create and add new overlay item for each store
     for (store in StoreList) {
+        //Add new overlay item
         storeOverlay.addItem(StoreOverlayItem(store, store.name))
 
+        //Change icon / marker if not default (albert_heijn)
         if (store.name.contains(other = "Jumbo", ignoreCase = true)) {
             storeOverlay.getItem(storeOverlay.size() - 1)
                 .setMarker(context.getDrawable(R.drawable.jumbo))
@@ -123,50 +135,66 @@ fun addStoreListToMap(
         }
     }
 
+    //Refresh mapView
     mapView.invalidate()
 }
 
+//Creates a route from the users position to the given stores position and adds it
 fun addRouteToMap(user: GeoPoint, store: GeoPoint, context: Context): Boolean {
-    var hasFinished = false
+    //Clear overlay
     mapView.overlays.remove(element = routeOverlay)
+    var hasFinished = false
 
+    //Run internet / API call on a blocking coroutine
     runBlocking {
-        //Creation
+        //Create path / road
         val road = roadManager.getRoad(arrayListOf<GeoPoint>(user, store))
         routeOverlay = RoadManager.buildRoadOverlay(road)
 
-        //Design
-        routeOverlay.outlinePaint.strokeCap = Paint.Cap.ROUND
-        routeOverlay.outlinePaint.strokeWidth = 15f
-        routeOverlay.outlinePaint.strokeJoin = Paint.Join.ROUND
-        routeOverlay.outlinePaint.color = context.getColor(R.color.purple_500)
-
+        //Check if the user has reached the given store, if not -> design and add the path
         if (road.mLength < 0.02) {
             hasFinished = true
         } else {
-            //Add the overlay to all overlays
+            //Give road overlay design
+            routeOverlay.outlinePaint.strokeCap = Paint.Cap.ROUND
+            routeOverlay.outlinePaint.strokeWidth = 15f
+            routeOverlay.outlinePaint.strokeJoin = Paint.Join.ROUND
+            routeOverlay.outlinePaint.color = context.getColor(R.color.purple_500)
+
+            //Add the overlay
             mapView.overlays.add(
                 index = 0,
-                element = routeOverlay)
+                element = routeOverlay
+            )
+
+            //Refresh
             mapView.invalidate()
         }
     }
 
+    //Returns true if the user is close enough to the given store
     return hasFinished
 }
 
+//Refreshes the users location on the map
 fun updateUserLocation(geoPoint: GeoPoint, context: Context) {
+    //Remove current overlay
     mapView.overlays.remove(element = locationOverlay)
+    //Create new overlay
     locationOverlay = IconOverlay(geoPoint, context.getDrawable(R.drawable.user))
+    //Add new overlay
     mapView.overlays.add(element = locationOverlay)
+    //Refresh
     mapView.invalidate()
 }
 
+//Recenter to given position (instant is only used on page transitions)
 fun recenter(geoPoint: GeoPoint, isInstant: Boolean) {
     val speed = if (isInstant) 0L else 1250L
     mapView.controller.animateTo(geoPoint, 18.0, speed)
 }
 
+//Defines the lifecycle of the given mapview
 @Composable
 private fun MapLifecycle(mapView: MapView) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -190,6 +218,7 @@ private fun MapView.lifecycleObserver() = LifecycleEventObserver { _, event ->
     }
 }
 
+//Wrapper for OverlayItem, specific to stores
 private class StoreOverlayItem(
     val store: Store,
     storeName: String

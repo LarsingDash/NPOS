@@ -17,7 +17,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import nl.beunbv.npos.MainActivity
 import nl.beunbv.npos.data.Store
 import nl.beunbv.npos.ui.components.StoreItem
@@ -26,7 +29,6 @@ import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import java.util.*
-import kotlin.collections.ArrayList
 
 lateinit var fullList: MutableState<List<Store>>
 lateinit var searchBarValue: MutableState<TextFieldValue>
@@ -38,20 +40,29 @@ fun SearchScreen(
     navController: NavController,
 ) {
     val context = LocalContext.current
+
+    //Initialize roadManager
     roadManager = OSRMRoadManager(context, Configuration.getInstance().userAgentValue)
     (roadManager as OSRMRoadManager).setMean(OSRMRoadManager.MEAN_BY_FOOT)
 
+    //Get full list of stores
     fullList = remember {
         mutableStateOf(value = MainActivity.jsonHandler.stores)
     }
+
+    //Remember text written in the searchbar
     searchBarValue = remember { mutableStateOf(TextFieldValue("")) }
 
+    //OpenedStore is from past compositions
     var openedStore: Store? by remember { mutableStateOf(null) }
+    //preOpenedStoreID comes from a navigational parameter
     var preOpenedStoreID by remember { mutableStateOf(storeID) }
 
+    //Throwaway clone of fullList, this one is used to filter and sort
     val arrayList = arrayListOf<Store>()
     arrayList.addAll(elements = fullList.value)
 
+    //Filter (on searchBarValue) and sort (on distance to user) cloned list
     val searchList = reformatList(
         list = arrayList,
         searchValue = searchBarValue.value.text,
@@ -59,15 +70,19 @@ fun SearchScreen(
         userLocation = MainActivity.userLocation
     )
 
+    //Main ui
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
+        //Search TextField
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = searchBarValue.value,
             onValueChange = { newValue ->
+                //Triggers recomposition
                 searchBarValue.value = newValue
             },
+            //Prompt text
             placeholder = {
                 Text(
                     text = "Type hier om te zoeken...",
@@ -80,6 +95,7 @@ fun SearchScreen(
             ),
         )
 
+        //Stores list
         LazyColumn(
             modifier = Modifier
                 .background(
@@ -91,13 +107,17 @@ fun SearchScreen(
                 )
                 .fillMaxHeight()
         ) {
+            //For every store item:
             items(count = searchList.size) { index ->
+                //Get current store
                 val store = searchList[index]
 
+                //Default foldout option is folded in -> check if it needs to be unfolded
                 var foldout = false
                 openedStore?.let { if (openedStore == store) foldout = true }
                 preOpenedStoreID?.let { if (preOpenedStoreID == store.id) foldout = true }
 
+                //ui per store card
                 StoreItem(
                     store = store,
                     onFoldClick = {
@@ -112,6 +132,7 @@ fun SearchScreen(
     }
 }
 
+//Filters (on given searchValue) and sorts (by distance to given location) given arraylist
 lateinit var roadManager: RoadManager
 fun reformatList(
     list: ArrayList<Store>,
@@ -119,45 +140,62 @@ fun reformatList(
     roadManager: RoadManager,
     userLocation: GeoPoint
 ): List<Store> {
+    //Treemap for automatic sorting on distance (Double)
     val map = TreeMap<Double, Store>()
+
+    //List of internet RoadManager loaders
     val loaders = ArrayList<Job>()
 
+    //Run internet / API calls on coroutine
     runBlocking {
+        //Start a loader for each store that passes the filter
         list.forEach { store ->
+            //Filter if the searchValue is contained in one of the names of the products of the current store
             if (searchValue.isNotBlank()) {
                 var containsFilter = false
 
+                //Run in separate scope to gain the ability to break out of the loop
                 run breaking@{
+                    //Check each of the store's products' names to see if it contains the searchValue
                     store.products.forEach { product ->
                         if (product.name.contains(
                                 other = searchValue,
                                 ignoreCase = true
                             )
                         ) {
+                            //Stop checking (it only needs one product to pass the filter)
                             containsFilter = true
                             return@breaking
                         }
                     }
                 }
 
+                //Skip the loading segment below if filter was not passed
                 if (!containsFilter) return@forEach
             }
 
+            //Load road from the OSRMRoadManager API asynchronously
             val loader = launch(Dispatchers.IO) {
                 val road = roadManager.getRoad(
                     arrayListOf(userLocation, store.location)
                 )
 
+                //Store the length of the retrieved road in the automatically sorting map
                 map[road.mLength] = store
             }
+            //Add itself to the list of loaders to wait for
             loaders.add(loader)
         }
 
-        loaders.forEach { job -> job.join()}
+        //Wait for all loaders to finish
+        loaders.forEach { job -> job.join() }
     }
 
+    //Clear given list (just to be sure)
     list.clear()
+    //Fill given list with the automatically sorted results from the filter
     map.forEach { entry -> list.add(element = entry.value) }
 
+    //Return filtered (on given searchValue) and sorted (by distance to given location) list
     return list
 }

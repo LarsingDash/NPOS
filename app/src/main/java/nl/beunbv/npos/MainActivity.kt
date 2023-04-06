@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -16,7 +15,7 @@ import androidx.activity.compose.setContent
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 import nl.beunbv.npos.data.JSONHandler
-import nl.beunbv.npos.notification.StoreCheckingService
+import nl.beunbv.npos.notification.StoreCheckingService.Companion.initStoreCheckingService
 import nl.beunbv.npos.ui.NPOS
 import nl.beunbv.npos.ui.screens.fullList
 import nl.beunbv.npos.ui.theme.NPOSTheme
@@ -28,6 +27,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //Thread policies for internet access
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this))
@@ -35,16 +35,19 @@ class MainActivity : ComponentActivity() {
         //Orientation lock
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
+        //Initialize JSON
         jsonHandler = JSONHandler(
             productsStream = resources.openRawResource(R.raw.products),
             storesStream = resources.openRawResource(R.raw.stores),
         )
 
+        //Start location service
         setupUserLocation(context = this)
 
-        val intent = Intent(this, StoreCheckingService::class.java)
-        startService(intent)
+        //Start background service
+        initStoreCheckingService(this)
 
+        //Setup ui
         setContent {
             NPOSTheme {
                 NPOS()
@@ -52,24 +55,20 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onDestroy() {
-        val intent = Intent(this, StoreCheckingService::class.java)
-        stopService(intent)
-
-        super.onDestroy()
-    }
-
     companion object {
+        //Global variables
         lateinit var jsonHandler: JSONHandler
         var unfoldedStore: Int = -1
 
+        //Location
         private var hasPermissions: Boolean = false
         var userLocation = GeoPoint(51.5892100, 4.7805200)
         var lastUserLocation = GeoPoint(0.0, 0.0)
         var locationUpdateCallback: (GeoPoint) -> Unit = {}
 
+        //Sets up the location service
         fun setupUserLocation(context: Context) {
-            //Setup provider and requests
+            //Setup provider and request
             val provider = LocationServices.getFusedLocationProviderClient(context)
             val request = LocationRequest.Builder(
                 Priority.PRIORITY_HIGH_ACCURACY,
@@ -117,8 +116,9 @@ class MainActivity : ComponentActivity() {
                     callback,
                     Looper.getMainLooper()
                 )
-
-            } else {
+            }
+            //If permissions were not granted: request them
+            else {
                 ActivityCompat.requestPermissions(
                     context as Activity,
                     arrayOf(

@@ -38,42 +38,55 @@ lateinit var currentPage: MutableState<String>
 fun NPOS() {
     val navController: NavHostController = rememberNavController()
 
+    //Remember current page
     currentPage = remember {
         mutableStateOf(value = Pages.Search.title)
     }
 
+    //Save activity
     val currentActivity = LocalContext.current as Activity
 
+    //Main ui
     Scaffold(
+        //Bottom bar: Search - Map
+        //Unit switches page if that page wasn't already selected
         bottomBar = {
             BottomBar(
                 searchButtonUnit = {
                     if (currentPage.value != Pages.Search.title) {
+                        //-1 == none
                         MainActivity.unfoldedStore = -1
-                        navController.navigate(route = Pages.Search.title)
+
                         currentPage.value = Pages.Search.title
+                        navController.navigate(route = Pages.Search.title)
                     }
                 },
                 mapButtonUnit = {
                     if (currentPage.value != Pages.Map.title) {
-                        navController.navigate(route = Pages.Map.title + "/-1")
                         currentPage.value = Pages.Map.title
+                        navController.navigate(route = Pages.Map.title + "/-1")
                     }
                 }
             )
         }
     ) { paddingValues ->
+        //Main body
         NavHost(
             navController = navController,
             startDestination = Pages.Search.title,
             modifier = Modifier.padding(paddingValues = paddingValues)
         ) {
+            //Search page
             composable(
                 route = Pages.Search.title,
             ) {
+                //Page
                 SearchScreen(
                     storeID = MainActivity.unfoldedStore,
-                    navController = navController)
+                    navController = navController
+                )
+
+                //Back button - return back to map if unfoldedStore != -1
                 BackHandler(enabled = true) {
                     if (MainActivity.unfoldedStore == -1) currentActivity.finish()
                     else {
@@ -88,16 +101,22 @@ fun NPOS() {
                 route = Pages.Map.title + "/{storeID}",
                 arguments = listOf(navArgument(name = "storeID") { type = NavType.IntType })
             ) {
-                val storeID = it.arguments?.getInt("storeID")
+                it.arguments?.let { bundle ->
+                    val storeID = bundle.getInt("storeID")
 
-                MapScreen(
-                    storeID = storeID!!,
-                    navController = navController)
-                BackHandler(enabled = true) {
-                    if (storeID == 0) currentActivity.finish()
-                    else {
-                        navController.popBackStack()
-                        currentPage.value = Pages.Search.title
+                    //Page
+                    MapScreen(
+                        storeID = storeID,
+                        navController = navController
+                    )
+
+                    //Back button - return back to search if storeID != 0
+                    BackHandler(enabled = true) {
+                        if (storeID == -1) currentActivity.finish()
+                        else {
+                            navController.popBackStack()
+                            currentPage.value = Pages.Search.title
+                        }
                     }
                 }
             }
@@ -130,7 +149,8 @@ private fun BottomBar(
                             start = 0.dp,
                             top = 0.dp,
                             end = 0.dp,
-                            bottom = 3.dp)
+                            bottom = 3.dp
+                        )
                     )
                 },
                 selected = currentPage.value == Pages.Search.title,
@@ -155,7 +175,8 @@ private fun BottomBar(
                             start = 0.dp,
                             top = 0.dp,
                             end = 0.dp,
-                            bottom = 3.dp)
+                            bottom = 3.dp
+                        )
                     )
                 },
                 selected = currentPage.value == Pages.Map.title,
