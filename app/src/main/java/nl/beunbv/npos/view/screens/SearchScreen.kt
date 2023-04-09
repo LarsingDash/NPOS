@@ -13,7 +13,6 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -25,9 +24,7 @@ import nl.beunbv.npos.MainActivity
 import nl.beunbv.npos.model.StoreModel
 import nl.beunbv.npos.view.components.StoreItem
 import nl.beunbv.npos.viewModel.LocationViewModel
-import org.osmdroid.bonuspack.routing.OSRMRoadManager
-import org.osmdroid.bonuspack.routing.RoadManager
-import org.osmdroid.config.Configuration
+import nl.beunbv.npos.viewModel.RoadManagerViewModel
 import org.osmdroid.util.GeoPoint
 import java.util.*
 
@@ -40,12 +37,6 @@ fun SearchScreen(
     storeID: Int?,
     navController: NavController,
 ) {
-    val context = LocalContext.current
-
-    //Initialize roadManager
-    roadManager = OSRMRoadManager(context, Configuration.getInstance().userAgentValue)
-    (roadManager as OSRMRoadManager).setMean(OSRMRoadManager.MEAN_BY_FOOT)
-
     //Get full list of stores
     fullList = remember {
         mutableStateOf(value = MainActivity.dataViewModel.stores)
@@ -67,7 +58,6 @@ fun SearchScreen(
     val searchList = reformatList(
         list = arrayList,
         searchValue = searchBarValue.value.text,
-        roadManager = roadManager,
         userLocation = LocationViewModel.getUserLocation()
     )
 
@@ -134,11 +124,9 @@ fun SearchScreen(
 }
 
 //Filters (on given searchValue) and sorts (by distance to given location) given arraylist
-lateinit var roadManager: RoadManager
 fun reformatList(
     list: ArrayList<StoreModel>,
     searchValue: String,
-    roadManager: RoadManager,
     userLocation: GeoPoint
 ): List<StoreModel> {
     //Treemap for automatic sorting on distance (Double)
@@ -177,7 +165,7 @@ fun reformatList(
 
             //Load road from the OSRMRoadManager API asynchronously
             val loader = launch(Dispatchers.IO) {
-                val road = roadManager.getRoad(
+                val road = RoadManagerViewModel.getRoad(
                     arrayListOf(userLocation, store.location)
                 )
 

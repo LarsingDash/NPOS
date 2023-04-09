@@ -2,13 +2,10 @@ package nl.beunbv.npos.viewModel
 
 import android.content.Context
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import nl.beunbv.npos.MainActivity
 import nl.beunbv.npos.model.Messages
-import nl.beunbv.npos.model.NotificationHandler
+import nl.beunbv.npos.model.NotificationModel
 import nl.beunbv.npos.model.StoreModel
 import java.time.LocalDateTime
 
@@ -17,11 +14,12 @@ class NotificationViewModel {
         private var isRunning = true
 
         //Initiate background coroutine to keep track of store times
+        @OptIn(DelicateCoroutinesApi::class)
         fun initStoreCheckingService(
             context: Context
         ) {
             //Initiate notification handler
-            NotificationHandler.init(context = context)
+            NotificationModel.init(context = context)
 
             //Start Coroutine
             GlobalScope.launch(Dispatchers.IO) {
@@ -63,7 +61,7 @@ class NotificationViewModel {
             //Opening time
             if (store.openTime.compareTimes(now = currentTime)) {
                 context?.let {
-                    NotificationHandler.postMessage(
+                    NotificationModel.postMessage(
                         storeName = store.name,
                         storeID = store.id,
                         message = Messages.OPEN,
@@ -75,7 +73,7 @@ class NotificationViewModel {
             //Closing time
                 if (store.closeTime.compareTimes(now = currentTime)) {
                     context?.let {
-                        NotificationHandler.postMessage(
+                        NotificationModel.postMessage(
                             storeName = store.name,
                             storeID = store.id,
                             message = Messages.CLOSE,

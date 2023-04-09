@@ -12,8 +12,8 @@ import nl.beunbv.npos.view.NPOS
 import nl.beunbv.npos.view.theme.NPOSTheme
 import nl.beunbv.npos.viewModel.DataViewModel
 import nl.beunbv.npos.viewModel.LocationViewModel
-import nl.beunbv.npos.viewModel.LocationViewModel.Companion.setupUserLocation
-import nl.beunbv.npos.viewModel.NotificationViewModel.Companion.initStoreCheckingService
+import nl.beunbv.npos.viewModel.NotificationViewModel
+import nl.beunbv.npos.viewModel.RoadManagerViewModel
 import org.osmdroid.config.Configuration
 
 class MainActivity : ComponentActivity() {
@@ -35,11 +35,10 @@ class MainActivity : ComponentActivity() {
             storesStream = resources.openRawResource(R.raw.stores),
         )
 
-        //Start location service
-        setupUserLocation(context = this)
-
-        //Start background service
-        initStoreCheckingService(this)
+        //Start view models
+        LocationViewModel.setupUserLocation(context = this)
+        NotificationViewModel.initStoreCheckingService(this)
+        RoadManagerViewModel.init(this)
 
         //Setup ui
         setContent {
@@ -49,6 +48,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    //Initiate callback for permission request, remotely init location provider if granted
+    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

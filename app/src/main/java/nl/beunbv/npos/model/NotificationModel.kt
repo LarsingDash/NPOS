@@ -16,7 +16,7 @@ enum class Messages(val wentOpen: Boolean) {
     ARRIVE(true)
 }
 
-class NotificationHandler {
+class NotificationModel {
     companion object {
         private lateinit var manager: NotificationManager
         private const val channelID = "NPOS"

@@ -22,7 +22,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import nl.beunbv.npos.MainActivity
-import nl.beunbv.npos.view.screens.MapScreen
 import nl.beunbv.npos.view.screens.SearchScreen
 import nl.beunbv.npos.view.theme.iconSelected
 import nl.beunbv.npos.view.theme.iconUnselected
@@ -105,7 +104,7 @@ fun NPOS() {
                     val storeID = bundle.getInt("storeID")
 
                     //Page
-                    MapScreen(
+                    MapScreenView(
                         storeID = storeID,
                         navController = navController
                     )
