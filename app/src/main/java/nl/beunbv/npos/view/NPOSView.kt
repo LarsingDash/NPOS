@@ -25,6 +25,7 @@ import nl.beunbv.npos.MainActivity
 import nl.beunbv.npos.view.screens.SearchScreen
 import nl.beunbv.npos.view.theme.iconSelected
 import nl.beunbv.npos.view.theme.iconUnselected
+import nl.beunbv.npos.viewModel.MapScreenView
 
 enum class Pages(val title: String) {
     Search("ZOEKEN"),
