@@ -6,11 +6,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
-import nl.beunbv.npos.MainActivity
-import nl.beunbv.npos.view.screens.fullList
 import org.osmdroid.util.GeoPoint
 
 class LocationModel {

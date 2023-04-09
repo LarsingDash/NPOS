@@ -24,7 +24,7 @@ private var locationOverlay: IconOverlay = IconOverlay()
 private var routeOverlay = Polyline()
 
 @Composable
-fun MapScreenView(
+fun MapScreen(
     storeID: Int,
     navController: NavController,
 ) {
@@ -148,14 +148,14 @@ fun addRouteToMap(user: GeoPoint, store: GeoPoint, context: Context): Boolean {
     mapView.overlays.remove(element = routeOverlay)
 
     //RoadManager will create overlay if route wasn't finished, otherwise overlay == null
-    val overlay = RoadManagerViewModel.createRoadOverlay(
+    val routeOverlay = RoadManagerViewModel.createRoadOverlay(
         user = user,
         store = store,
         context = context
     )
 
     //Returns true if the user is close enough to the given store
-    overlay?.let {
+    routeOverlay?.let {
         //Add the overlay
         mapView.overlays.add(
             index = 0,

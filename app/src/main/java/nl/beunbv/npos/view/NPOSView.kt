@@ -22,10 +22,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import nl.beunbv.npos.MainActivity
-import nl.beunbv.npos.view.screens.SearchScreen
+import nl.beunbv.npos.view.components.SearchScreen
 import nl.beunbv.npos.view.theme.iconSelected
 import nl.beunbv.npos.view.theme.iconUnselected
-import nl.beunbv.npos.viewModel.MapScreenView
+import nl.beunbv.npos.viewModel.MapScreen
 
 enum class Pages(val title: String) {
     Search("ZOEKEN"),
@@ -105,7 +105,7 @@ fun NPOS() {
                     val storeID = bundle.getInt("storeID")
 
                     //Page
-                    MapScreenView(
+                    MapScreen(
                         storeID = storeID,
                         navController = navController
                     )

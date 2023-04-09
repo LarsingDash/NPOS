@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import nl.beunbv.npos.viewModel.DataViewModel
 import nl.beunbv.npos.model.StoreModel
-import nl.beunbv.npos.view.screens.reformatList
+import nl.beunbv.npos.viewModel.reformatList
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
