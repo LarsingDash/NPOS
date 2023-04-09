@@ -1,4 +1,4 @@
-package nl.beunbv.npos.notification
+package nl.beunbv.npos.viewModel
 
 import android.content.Context
 import android.util.Log
@@ -7,10 +7,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import nl.beunbv.npos.MainActivity
-import nl.beunbv.npos.data.Store
+import nl.beunbv.npos.model.Messages
+import nl.beunbv.npos.model.NotificationHandler
+import nl.beunbv.npos.model.StoreModel
 import java.time.LocalDateTime
 
-class StoreCheckingService {
+class NotificationViewModel {
     companion object {
         private var isRunning = true
 
@@ -23,7 +25,7 @@ class StoreCheckingService {
 
             //Start Coroutine
             GlobalScope.launch(Dispatchers.IO) {
-                val stores = MainActivity.jsonHandler.stores
+                val stores = MainActivity.dataViewModel.stores
 
                 //Loop every minute
                 while (isRunning) {
@@ -54,7 +56,7 @@ class StoreCheckingService {
 
         //Checks the time of a given store and sends a notification if necessary
         fun checkTime(
-            store: Store,
+            store: StoreModel,
             currentTime: Pair<Int, Int>,
             context: Context?
         ): Boolean {

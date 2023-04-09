@@ -2,12 +2,12 @@ package nl.beunbv.npos
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
-import nl.beunbv.npos.data.JSONHandler
+import nl.beunbv.npos.viewModel.DataViewModel
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class JSONHandlerTest {
+class DataViewModelTest {
     private lateinit var testContext: Context
 
     @Before
@@ -17,12 +17,12 @@ class JSONHandlerTest {
 
     @Test
     fun readStoresTest() {
-        val jsonHandler = JSONHandler(
+        val dataViewModel = DataViewModel(
             productsStream = testContext.resources.openRawResource(R.raw.test_products),
             storesStream = testContext.resources.openRawResource(R.raw.test_stores),
         )
 
-        val stores = jsonHandler.stores
+        val stores = dataViewModel.stores
         val expectedList = listOf(stores[0], stores[1], stores[2])
         val expectedNames = arrayListOf<String>()
         for (store in expectedList) {
@@ -30,7 +30,7 @@ class JSONHandlerTest {
         }
 
         val readList =
-            jsonHandler.readStores(stream = testContext.resources.openRawResource(R.raw.test_stores))
+            dataViewModel.readStores(stream = testContext.resources.openRawResource(R.raw.test_stores))
         val readNames = arrayListOf<String>()
         for (store in readList) {
             readNames.add(element = store.name)
@@ -41,14 +41,14 @@ class JSONHandlerTest {
 
     @Test
     fun readProductsTest() {
-        val jsonHandler = JSONHandler(
+        val dataViewModel = DataViewModel(
             productsStream = testContext.resources.openRawResource(R.raw.test_products),
             storesStream = testContext.resources.openRawResource(R.raw.test_stores),
         )
 
         val expectedNames = arrayListOf("Product - 0", "Product - 1", "Product - 2")
         val readList =
-            jsonHandler.readProducts(stream = testContext.resources.openRawResource(R.raw.test_products))
+            dataViewModel.readProducts(stream = testContext.resources.openRawResource(R.raw.test_products))
         val readNames = arrayListOf<String>()
         for (product in readList) {
             readNames.add(element = product.name)

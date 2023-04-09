@@ -1,30 +1,32 @@
-package nl.beunbv.npos.data
+package nl.beunbv.npos.viewModel
 
+import nl.beunbv.npos.model.ProductModel
+import nl.beunbv.npos.model.StoreModel
 import org.json.JSONArray
 import org.json.JSONObject
 import org.osmdroid.util.GeoPoint
 import java.io.InputStream
 import java.io.InputStreamReader
 
-class JSONHandler(
+class DataViewModel(
     productsStream: InputStream,
     storesStream: InputStream
 ) {
-    private val products: List<Product> = readProducts(productsStream)
-    val stores: List<Store> = readStores(storesStream)
+    private val products: List<ProductModel> = readProducts(productsStream)
+    val stores: List<StoreModel> = readStores(storesStream)
 
     //Reads products from the given InputStream (raw JSON)
-    fun readProducts(stream: InputStream): List<Product> {
+    fun readProducts(stream: InputStream): List<ProductModel> {
         val reader = InputStreamReader(stream)
         val array = JSONArray(JSONObject(reader.readText())["products"].toString())
 
-        val products = arrayListOf<Product>()
+        val products = arrayListOf<ProductModel>()
 
         for (i in 0 until array.length()) {
             val currentProduct = array[i] as JSONObject
 
             products.add(
-                element = Product(name = currentProduct["name"] as String)
+                element = ProductModel(name = currentProduct["name"] as String)
             )
         }
 
@@ -32,17 +34,17 @@ class JSONHandler(
     }
 
     //Reads stores from the given InputStream (raw JSON)
-    fun readStores(stream: InputStream): List<Store> {
+    fun readStores(stream: InputStream): List<StoreModel> {
         val reader = InputStreamReader(stream)
         val array = JSONArray(JSONObject(reader.readText())["stores"].toString())
 
-        val stores = arrayListOf<Store>()
+        val stores = arrayListOf<StoreModel>()
 
         for (i in 0 until array.length()) {
             val currentStore = array[i] as JSONObject
 
             val storeProducts = (currentStore["products"] as String).split(',')
-            val productsList = arrayListOf<Product>()
+            val productsList = arrayListOf<ProductModel>()
             for (id in storeProducts) {
                 productsList.add(products[id.trim().toInt()])
             }
@@ -51,7 +53,7 @@ class JSONHandler(
             val closeList = (currentStore["close"] as String).split(':')
 
             stores.add(
-                element = Store(
+                element = StoreModel(
                     id = currentStore["id"] as Int,
                     name = currentStore["name"] as String,
                     location = GeoPoint(

@@ -1,4 +1,4 @@
-package nl.beunbv.npos.ui.theme
+package nl.beunbv.npos.view.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

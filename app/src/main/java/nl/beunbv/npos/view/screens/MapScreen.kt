@@ -1,4 +1,4 @@
-package nl.beunbv.npos.ui.screens
+package nl.beunbv.npos.view.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,10 +22,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import nl.beunbv.npos.MainActivity
-import nl.beunbv.npos.data.Store
-import nl.beunbv.npos.notification.Messages
-import nl.beunbv.npos.notification.NotificationHandler
-import nl.beunbv.npos.ui.components.*
+import nl.beunbv.npos.model.StoreModel
+import nl.beunbv.npos.model.Messages
+import nl.beunbv.npos.model.NotificationHandler
+import nl.beunbv.npos.view.components.*
+import nl.beunbv.npos.viewModel.LocationViewModel
 
 @Composable
 fun MapScreen(
@@ -40,14 +41,14 @@ fun MapScreen(
     //Remember selected store? that could have been passed through as a navigational argument
     //Null means no route is active
     val store = remember {
-        mutableStateOf(if (storeID == -1) null else MainActivity.jsonHandler.stores[storeID])
+        mutableStateOf(if (storeID == -1) null else MainActivity.dataViewModel.stores[storeID])
     }
 
     //If a store was passed through, that means a route should be started
     store.value?.let {
         //Create route
         addRouteToMap(
-            user = MainActivity.userLocation,
+            user = LocationViewModel.getUserLocation(),
             store = store.value!!.location,
             context = context
         )
@@ -61,18 +62,18 @@ fun MapScreen(
 
     //Add all stores to map
     addStoreListToMap(
-        StoreList = MainActivity.jsonHandler.stores,
+        StoreList = MainActivity.dataViewModel.stores,
         context = context
     )
 
     //Add / update user on the map
     updateUserLocation(
-        geoPoint = MainActivity.userLocation,
+        geoPoint = LocationViewModel.getUserLocation(),
         context = context
     )
 
     //Subscribe to callback from locationProvider
-    MainActivity.locationUpdateCallback = { newLocation ->
+    LocationViewModel.addCallback { newLocation ->
         //Update user location when a new location is received
         updateUserLocation(
             geoPoint = newLocation,
@@ -127,7 +128,7 @@ fun MapScreen(
                 .clickable {
                     //Center user on mapView
                     recenter(
-                        geoPoint = MainActivity.userLocation,
+                        geoPoint = LocationViewModel.getUserLocation(),
                         isInstant = false
                     )
                 },
@@ -162,7 +163,7 @@ fun MapScreen(
                     .clickable {
                         store.value?.let {
                             //Center selected store on mapView
-                            val temp = store.value as Store
+                            val temp = store.value as StoreModel
                             recenter(
                                 geoPoint = temp.location,
                                 isInstant = false

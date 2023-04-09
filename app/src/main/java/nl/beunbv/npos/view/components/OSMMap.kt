@@ -1,4 +1,4 @@
-package nl.beunbv.npos.ui.components
+package nl.beunbv.npos.view.components
 
 import android.content.Context
 import android.graphics.Paint
@@ -15,9 +15,10 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.runBlocking
 import nl.beunbv.npos.MainActivity
 import nl.beunbv.npos.R
-import nl.beunbv.npos.data.Store
-import nl.beunbv.npos.ui.Pages
-import nl.beunbv.npos.ui.currentPage
+import nl.beunbv.npos.model.StoreModel
+import nl.beunbv.npos.view.Pages
+import nl.beunbv.npos.view.currentPage
+import nl.beunbv.npos.viewModel.LocationViewModel
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.config.Configuration
@@ -66,7 +67,7 @@ fun OSMMap(
                 maxZoomLevel = 20.0
                 isTilesScaledToDpi = true
 
-                controller.setCenter(MainActivity.userLocation)
+                controller.setCenter(LocationViewModel.getUserLocation())
                 controller.setZoom(17.0)
 
                 //Add storeOverlay
@@ -114,7 +115,7 @@ private fun createStoreOverlay(
 
 //Adds the given StoreList to the storeOverlay and refreshes the map
 fun addStoreListToMap(
-    StoreList: List<Store>,
+    StoreList: List<StoreModel>,
     context: Context,
 ) {
     //Clear overlay
@@ -220,6 +221,6 @@ private fun MapView.lifecycleObserver() = LifecycleEventObserver { _, event ->
 
 //Wrapper for OverlayItem, specific to stores
 private class StoreOverlayItem(
-    val store: Store,
+    val store: StoreModel,
     storeName: String
 ) : OverlayItem(storeName, null, store.location)

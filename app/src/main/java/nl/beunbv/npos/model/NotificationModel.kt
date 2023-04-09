@@ -1,4 +1,4 @@
-package nl.beunbv.npos.notification
+package nl.beunbv.npos.model
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

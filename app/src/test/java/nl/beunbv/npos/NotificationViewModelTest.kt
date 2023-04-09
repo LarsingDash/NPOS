@@ -1,13 +1,13 @@
 package nl.beunbv.npos
 
-import nl.beunbv.npos.data.Store
-import nl.beunbv.npos.notification.StoreCheckingService
-import nl.beunbv.npos.notification.StoreCheckingService.Companion.compareTimes
+import nl.beunbv.npos.model.StoreModel
+import nl.beunbv.npos.viewModel.NotificationViewModel
+import nl.beunbv.npos.viewModel.NotificationViewModel.Companion.compareTimes
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.osmdroid.util.GeoPoint
 
-class StoreCheckingServiceTest {
+class NotificationViewModelTest {
     @Test
     fun compareTimeTest() {
         //Same hour positive
@@ -48,7 +48,7 @@ class StoreCheckingServiceTest {
 
     @Test
     fun checkTimeTest() {
-        val testStore = Store(
+        val testStore = StoreModel(
             id = 0,
             name = "",
             location = GeoPoint(0.0, 0.0),
@@ -59,7 +59,7 @@ class StoreCheckingServiceTest {
 
         //Open positive
         assertEquals(
-            true, StoreCheckingService.checkTime(
+            true, NotificationViewModel.checkTime(
                 store = testStore,
                 currentTime = Pair(first = 12, second = 24),
                 context = null
@@ -68,7 +68,7 @@ class StoreCheckingServiceTest {
 
         //Open negative
         assertEquals(
-            false, StoreCheckingService.checkTime(
+            false, NotificationViewModel.checkTime(
                 store = testStore,
                 currentTime = Pair(first = 11, second = 24),
                 context = null
@@ -77,7 +77,7 @@ class StoreCheckingServiceTest {
 
         //Close positive
         assertEquals(
-            true, StoreCheckingService.checkTime(
+            true, NotificationViewModel.checkTime(
                 store = testStore,
                 currentTime = Pair(first = 20, second = 50),
                 context = null
@@ -86,7 +86,7 @@ class StoreCheckingServiceTest {
 
         //Close positive
         assertEquals(
-            false, StoreCheckingService.checkTime(
+            false, NotificationViewModel.checkTime(
                 store = testStore,
                 currentTime = Pair(first = 21, second = 50),
                 context = null

@@ -1,4 +1,4 @@
-package nl.beunbv.npos.ui.screens
+package nl.beunbv.npos.view.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -22,15 +22,16 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import nl.beunbv.npos.MainActivity
-import nl.beunbv.npos.data.Store
-import nl.beunbv.npos.ui.components.StoreItem
+import nl.beunbv.npos.model.StoreModel
+import nl.beunbv.npos.view.components.StoreItem
+import nl.beunbv.npos.viewModel.LocationViewModel
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import java.util.*
 
-lateinit var fullList: MutableState<List<Store>>
+lateinit var fullList: MutableState<List<StoreModel>>
 lateinit var searchBarValue: MutableState<TextFieldValue>
 
 
@@ -47,19 +48,19 @@ fun SearchScreen(
 
     //Get full list of stores
     fullList = remember {
-        mutableStateOf(value = MainActivity.jsonHandler.stores)
+        mutableStateOf(value = MainActivity.dataViewModel.stores)
     }
 
     //Remember text written in the searchbar
     searchBarValue = remember { mutableStateOf(TextFieldValue("")) }
 
     //OpenedStore is from past compositions
-    var openedStore: Store? by remember { mutableStateOf(null) }
+    var openedStore: StoreModel? by remember { mutableStateOf(null) }
     //preOpenedStoreID comes from a navigational parameter
     var preOpenedStoreID by remember { mutableStateOf(storeID) }
 
     //Throwaway clone of fullList, this one is used to filter and sort
-    val arrayList = arrayListOf<Store>()
+    val arrayList = arrayListOf<StoreModel>()
     arrayList.addAll(elements = fullList.value)
 
     //Filter (on searchBarValue) and sort (on distance to user) cloned list
@@ -67,7 +68,7 @@ fun SearchScreen(
         list = arrayList,
         searchValue = searchBarValue.value.text,
         roadManager = roadManager,
-        userLocation = MainActivity.userLocation
+        userLocation = LocationViewModel.getUserLocation()
     )
 
     //Main ui
@@ -135,13 +136,13 @@ fun SearchScreen(
 //Filters (on given searchValue) and sorts (by distance to given location) given arraylist
 lateinit var roadManager: RoadManager
 fun reformatList(
-    list: ArrayList<Store>,
+    list: ArrayList<StoreModel>,
     searchValue: String,
     roadManager: RoadManager,
     userLocation: GeoPoint
-): List<Store> {
+): List<StoreModel> {
     //Treemap for automatic sorting on distance (Double)
-    val map = TreeMap<Double, Store>()
+    val map = TreeMap<Double, StoreModel>()
 
     //List of internet RoadManager loaders
     val loaders = ArrayList<Job>()

@@ -1,4 +1,4 @@
-package nl.beunbv.npos.ui.components
+package nl.beunbv.npos.view.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -24,14 +24,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import nl.beunbv.npos.data.Store
-import nl.beunbv.npos.ui.Pages
-import nl.beunbv.npos.ui.currentPage
+import nl.beunbv.npos.model.StoreModel
+import nl.beunbv.npos.view.Pages
+import nl.beunbv.npos.view.currentPage
 
 //ui for Store Item on the search page
 @Composable
 fun StoreItem(
-    store: Store,
+    store: StoreModel,
     onFoldClick: () -> Unit,
     isFoldedOut: Boolean,
     navController: NavController,
@@ -135,7 +135,7 @@ fun ListItemHeader(
 //Body of store item card
 @Composable
 fun ListItemBody(
-    store: Store,
+    store: StoreModel,
     navController: NavController,
 ) {
     //Main column, Navigates the corresponding store to map when clicked

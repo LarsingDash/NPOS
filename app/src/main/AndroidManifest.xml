@@ -18,7 +18,7 @@
         android:theme="@style/Theme.NPOS"
         tools:targetApi="31">
         <service
-            android:name=".notification.StoreCheckingService"
+            android:name=".viewModel.NotificationViewModel"
             android:enabled="true"
             android:exported="true" />
 

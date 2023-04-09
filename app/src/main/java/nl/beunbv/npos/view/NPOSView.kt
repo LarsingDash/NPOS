@@ -1,4 +1,4 @@
-package nl.beunbv.npos.ui
+package nl.beunbv.npos.view
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
@@ -22,10 +22,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import nl.beunbv.npos.MainActivity
-import nl.beunbv.npos.ui.screens.MapScreen
-import nl.beunbv.npos.ui.screens.SearchScreen
-import nl.beunbv.npos.ui.theme.iconSelected
-import nl.beunbv.npos.ui.theme.iconUnselected
+import nl.beunbv.npos.view.screens.MapScreen
+import nl.beunbv.npos.view.screens.SearchScreen
+import nl.beunbv.npos.view.theme.iconSelected
+import nl.beunbv.npos.view.theme.iconUnselected
 
 enum class Pages(val title: String) {
     Search("ZOEKEN"),

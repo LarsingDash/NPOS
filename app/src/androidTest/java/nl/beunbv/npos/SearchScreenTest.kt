@@ -2,9 +2,9 @@ package nl.beunbv.npos
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
-import nl.beunbv.npos.data.JSONHandler
-import nl.beunbv.npos.data.Store
-import nl.beunbv.npos.ui.screens.reformatList
+import nl.beunbv.npos.viewModel.DataViewModel
+import nl.beunbv.npos.model.StoreModel
+import nl.beunbv.npos.view.screens.reformatList
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -22,7 +22,7 @@ class SearchScreenTest {
 
     @Test
     fun reformatListTest() {
-        val jsonHandler = JSONHandler(
+        val dataViewModel = DataViewModel(
             testContext.resources.openRawResource(R.raw.test_products),
             testContext.resources.openRawResource(R.raw.test_stores),
         )
@@ -30,10 +30,10 @@ class SearchScreenTest {
         val roadManager = OSRMRoadManager(testContext, Configuration.getInstance().userAgentValue)
         roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT)
 
-        val stores = jsonHandler.stores
+        val stores = dataViewModel.stores
 
         //Distance test
-        val arrayStores1 = arrayListOf<Store>()
+        val arrayStores1 = arrayListOf<StoreModel>()
         arrayStores1.addAll(stores)
 
         val expectedList1 = listOf(stores[1], stores[2], stores[0])
@@ -47,7 +47,7 @@ class SearchScreenTest {
         assertEquals(expectedList1, reformattedList1)
 
         //Filter and distance Test
-        val arrayStores2 = arrayListOf<Store>()
+        val arrayStores2 = arrayListOf<StoreModel>()
         arrayStores2.addAll(stores)
 
         val expectedList2 = listOf(stores[2], stores[0])
