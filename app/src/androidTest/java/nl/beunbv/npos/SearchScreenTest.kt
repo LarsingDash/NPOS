@@ -4,7 +4,8 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import nl.beunbv.npos.viewModel.DataViewModel
 import nl.beunbv.npos.model.StoreModel
-import nl.beunbv.npos.viewModel.reformatList
+import nl.beunbv.npos.viewModel.RoadManagerViewModel
+import nl.beunbv.npos.viewModel.SearchScreenViewModel.Companion.reformatList
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -27,8 +28,7 @@ class SearchScreenTest {
             testContext.resources.openRawResource(R.raw.test_stores),
         )
 
-        val roadManager = OSRMRoadManager(testContext, Configuration.getInstance().userAgentValue)
-        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT)
+        RoadManagerViewModel.init(testContext)
 
         val stores = dataViewModel.stores
 
@@ -40,7 +40,6 @@ class SearchScreenTest {
         val reformattedList1 = reformatList(
             arrayStores1,
             "",
-            roadManager,
             GeoPoint(51.59852, 4.79586)
         )
 
@@ -54,7 +53,6 @@ class SearchScreenTest {
         val reformattedList2 = reformatList(
             arrayStores2,
             "Product - 2",
-            roadManager,
             GeoPoint(51.59852, 4.79586)
         )
 

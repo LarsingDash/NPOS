@@ -40,12 +40,13 @@ fun MapScreen(
         context = context,
         navController = navController
     )
-    MapScreenOverlay(store = store)
 
     init(
         context = context,
         store = store
     )
+
+    MapScreenOverlay(store = store)
 }
 
 fun init(
@@ -148,14 +149,16 @@ fun addRouteToMap(user: GeoPoint, store: GeoPoint, context: Context): Boolean {
     mapView.overlays.remove(element = routeOverlay)
 
     //RoadManager will create overlay if route wasn't finished, otherwise overlay == null
-    val routeOverlay = RoadManagerViewModel.createRoadOverlay(
+    val overlay = RoadManagerViewModel.createRoadOverlay(
         user = user,
         store = store,
         context = context
     )
 
     //Returns true if the user is close enough to the given store
-    routeOverlay?.let {
+    overlay?.let {
+        routeOverlay = overlay
+
         //Add the overlay
         mapView.overlays.add(
             index = 0,
@@ -166,7 +169,11 @@ fun addRouteToMap(user: GeoPoint, store: GeoPoint, context: Context): Boolean {
         mapView.invalidate()
 
         return false
-    } ?: return true
+    } ?: run {
+        //Refresh
+        mapView.invalidate()
+        return true
+    }
 }
 
 //Refreshes the users location on the map
